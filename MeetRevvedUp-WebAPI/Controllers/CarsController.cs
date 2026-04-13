@@ -1,0 +1,327 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MeetRevvedUp_WebAPI.Models;
+using System.Security.Claims;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+
+namespace MeetRevvedUp_WebAPI.Controllers
+{
+    [Authorize(Roles = "CarGuy")]
+    public class CarsController : Controller
+    {
+        private readonly RevvedUpContext _context;
+
+        public CarsController(RevvedUpContext context)
+        {
+            _context = context;
+        }
+
+        // GET: Cars
+        public async Task<IActionResult> Index()
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var cars = await _context.Cars.Where(c => c.IdentityUserId == userId).ToListAsync();
+            if(cars == null)
+            {
+                return RedirectToAction("Create");
+            }
+            var garageId = await _context.Garages.Where(x => x.IdentityUserId == userId).Select(x=> x.GarageId).FirstOrDefaultAsync();
+            var results = cars.Select(x => new ClientCarListRecord
+            {
+                CarId = x.CarId,
+                Make = x.Make,
+                Model = x.Model,
+                Year = x.Year,
+                AvgRating = x.AvgRating,
+                GarageId = garageId,
+            }).ToList();
+
+
+
+            return View(results);
+        }
+
+
+
+        public async Task<IActionResult> TopThree(int id)
+        {
+            var clientMeets = _context.ClientMeets.Where(c => c.MeetId == id).ToList();
+            List<CarMeetCar> cars = new List<CarMeetCar>();
+            foreach (var item in clientMeets)
+            {
+                var garage = await _context.Garages.FindAsync(item.ClientId); 
+                if(garage != null)
+                {
+                    var car = await _context.Cars.Where(x => x.CarId == garage.CarId).Select(x => new CarMeetCar
+                    {
+                        Make = x.Make,
+                        Model = x.Model,
+                        Year = x.Year,
+                        CarId = x.CarId,
+                        Mileage = x.Mileage,
+                        AvgRating = x.AvgRating,
+                        Mods = x.Mods,
+                        MeetId = id,
+                    }).FirstOrDefaultAsync();
+                    cars.Add(car);
+                }
+            }
+            List<CarMeetCar> topThree = new List<CarMeetCar>();
+            var carOne = new CarMeetCar();
+            var carTwo = new CarMeetCar();
+            var carThree = new CarMeetCar();
+            carOne.AvgRating = 0;
+            carTwo.AvgRating = 0;
+            carThree.AvgRating = 0;
+            foreach (var item in cars)
+            {
+                    if(item.AvgRating < carOne.AvgRating && item.AvgRating != carOne.AvgRating)
+                    {
+                        if(item.AvgRating < carTwo.AvgRating && item.AvgRating != carTwo.AvgRating)
+                        {
+                            if(item.AvgRating < carThree.AvgRating && item.AvgRating != carThree.AvgRating)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                carThree = item;
+                            }
+                        }
+                        else
+                        {
+                            carThree = carTwo;
+                            carTwo = item;
+                      
+                       
+                        }
+                    }
+                    else
+                    {
+                        carThree = carTwo;
+                        carTwo = carOne;
+                        carOne = item;
+                    }
+                    
+            }
+            if(carOne.CarId != 0) { topThree.Add(carOne); }
+            if(carTwo.CarId != 0) { topThree.Add(carTwo); }
+            if(carThree.CarId != 0) { topThree.Add(carThree); }
+
+            if(carOne.CarId == 0 && carOne.MeetId == 0) { carOne.MeetId = id; topThree.Add(carOne); }
+
+            return View(topThree);
+        }
+        public async Task<IActionResult> ClientDetails(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var garage = _context.Garages.Where(g => g.ClientId == id).FirstOrDefault();
+
+            var car = await _context.Cars.FirstOrDefaultAsync(m => m.CarId == garage.CarId);
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            return View(car);
+        }
+        public async Task<IActionResult> CarRate(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var car = await _context.Cars.FindAsync(id);
+            if (car == null)
+            {
+                return NotFound();
+            }
+            return View(car);
+        }
+
+        // POST: Cars/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CarRate(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating,ImageLocation,IdentityUserId")] Car car, int newRate)
+        {
+            var user = await _context.Clients.Where(x => x.IdentityUserId == car.IdentityUserId).FirstOrDefaultAsync();
+            var meetId = await _context.ClientMeets.Where(y => y.ClientId == user.ClientId).FirstOrDefaultAsync();
+            var meet = await _context.CarMeets.Where(x => x.MeetId == meetId.MeetId).FirstOrDefaultAsync();
+            if (id != car.CarId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid) 
+            {
+                try
+                {
+
+                    car.AvgRating = Convert.ToInt32( (newRate + car.AvgRating) / 2);
+                    _context.Update(car);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CarExists(car.CarId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                TwilioClient.Init(ApiKeys.TwilioAccountSid, ApiKeys.TwilioAuthToken);
+                var garage = _context.Garages.Where(c => c.CarId == id).FirstOrDefault();
+                var client = _context.Clients.Where(c => c.ClientId == garage.ClientId).FirstOrDefault();
+                var phoneNumber = ApiKeys.TwilioPhoneNumber;
+                var message = MessageResource.Create(
+            body: $"Hi {user.FirstName}! " +
+            $"Your {car.Year} {car.Make} {car.Model} was just rated at {meet.MeetName} in {meet.City}! Check it out!",
+            from: new Twilio.Types.PhoneNumber(phoneNumber),
+            to: new Twilio.Types.PhoneNumber("+1"+client.PhoneNumber.ToString())
+        );
+                return RedirectToAction("Details", "CarMeets", new { id = meet.MeetId });
+            }
+            else {
+                return View(car); }
+           
+        }
+        // GET: Cars/Details/5 
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var car = await _context.Cars
+                .FirstOrDefaultAsync(m => m.CarId == id);
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            return View(car);
+        }
+        // GET: Cars/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Cars/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating")] Car car)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(car);
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+                var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Garages");
+            }
+            return View(car);
+        }
+        // GET: Cars/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var car = await _context.Cars.FindAsync(id);
+            if (car == null)
+            {
+                return NotFound();
+            }
+            return View(car);
+        }
+
+        // POST: Cars/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,ImageLocation,AvgRating")] Car car)
+        {
+            if (id != car.CarId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    car.IdentityUserId = userId;
+                    _context.Update(car);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CarExists(car.CarId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(car);
+        }
+
+        // GET: Cars/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var car = await _context.Cars
+                .FirstOrDefaultAsync(m => m.CarId == id);
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            return View(car);
+        }
+
+        // POST: Cars/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var car = await _context.Cars.FindAsync(id);
+            _context.Cars.Remove(car);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool CarExists(int id)
+        {
+            return _context.Cars.Any(e => e.CarId == id);
+        }
+    }
+}
