@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="MeetRevvedAngular/MeetRevvedAngular.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="MeetRevvedUp-WebAPI/MeetRevvedUp-WebAPI.csproj" Id="6f854a61-806f-423d-b005-471994d6432e" />
+</Solution>
