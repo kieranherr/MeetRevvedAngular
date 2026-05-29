@@ -1,59 +1,50 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using MeetRevvedUp_WebAPI.Interfaces;
 using MeetRevvedUp_WebAPI.Models;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace MeetRevvedUp_WebAPI.Controllers
 {
     [Authorize(Roles = "CarGuy")]
     public class ClientsController : Controller
     {
-        private readonly RevvedUpContext _context;
+        private readonly IClientService _clientService;
 
-        public ClientsController(RevvedUpContext context)
+        public ClientsController(IClientService clientService)
         {
-            _context = context;
+            _clientService = clientService;
         }
 
         // GET: Clients
         public async Task<IActionResult> Index()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = await _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
+            var client = await _clientService.GetByIdentityAsync(userId);
             if (client == null)
             {
                 return RedirectToAction("Create");
             }
             return View("Details", client);
         }
+
         public async Task<IActionResult> FriendIndex()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = await _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
-            List<Client> clients = new List<Client>();
-            var friends = _context.Friends.Where(f => f.FriendOneId == client.ClientId);
-            foreach(var item in friends)
-            {
-                var tempClient = _context.Clients.Where(c => c.ClientId == item.FriendTwoId).FirstOrDefault();
-                clients.Add(tempClient);
-            }
-            return View(clients);
+            var friends = await _clientService.GetFriendsAsync(userId);
+            return View(friends.ToList());
         }
 
         // GET: Clients/Details/5
-        public async Task<IActionResult> Details(int? id )
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .Include(c => c.IdentityUser)
-                .FirstOrDefaultAsync(m => m.ClientId == id);
+            var client = await _clientService.GetByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
@@ -64,10 +55,7 @@ namespace MeetRevvedUp_WebAPI.Controllers
 
         // GET: Clients/Create
         public IActionResult Create()
-        { 
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
-
-
+        {
             return View();
         }
 
@@ -83,17 +71,16 @@ namespace MeetRevvedUp_WebAPI.Controllers
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 client.IdentityUserId = userId;
                 client.State = client.State.ToUpper();
-                _context.Add(client);
-                await _context.SaveChangesAsync();
+                await _clientService.CreateClientAsync(client);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", client.IdentityUserId);
             return View(client);
         }
-        // GET: Clients/Create
+
+        // GET: Clients/AddFriend
         public IActionResult AddFriend(int? id)
         {
-           if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -103,7 +90,7 @@ namespace MeetRevvedUp_WebAPI.Controllers
             return View(friend);
         }
 
-        // POST: Clients/Create
+        // POST: Clients/AddFriend
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -113,17 +100,14 @@ namespace MeetRevvedUp_WebAPI.Controllers
             if (ModelState.IsValid)
             {
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-                friend.FriendOneId = client.ClientId;
-
-                _context.Friends.Add(friend);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());
+                await _clientService.AddFriendAsync(friend, userId);
+                return RedirectToAction("Index", "CarMeets");
             }
-            
+
             return View();
         }
-        //GET: Clients/Edit/5
+
+        // GET: Clients/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -131,12 +115,11 @@ namespace MeetRevvedUp_WebAPI.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
+            var client = await _clientService.GetByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", client.IdentityUserId);
             return View(client);
         }
 
@@ -159,12 +142,11 @@ namespace MeetRevvedUp_WebAPI.Controllers
                     var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                     client.IdentityUserId = userId;
                     client.State = client.State.ToUpper();
-                    _context.Update(client);
-                    await _context.SaveChangesAsync();
+                    await _clientService.UpdateClientAsync(client);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.ClientId))
+                    if (!_clientService.ClientExists(client.ClientId))
                     {
                         return NotFound();
                     }
@@ -175,7 +157,6 @@ namespace MeetRevvedUp_WebAPI.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", client.IdentityUserId);
             return View(client);
         }
 
@@ -187,9 +168,7 @@ namespace MeetRevvedUp_WebAPI.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .Include(c => c.IdentityUser)
-                .FirstOrDefaultAsync(m => m.ClientId == id);
+            var client = await _clientService.GetByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
@@ -203,24 +182,13 @@ namespace MeetRevvedUp_WebAPI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = await _context.Clients.FindAsync(id);
-            _context.Clients.Remove(client);
-            await _context.SaveChangesAsync();
+            await _clientService.DeleteClientAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        public  string GetUserNameById(string userName)
+        public string GetUserNameById(string userName)
         {
-            var identityUser = _context.Users.Where(x => x.UserName == userName).FirstOrDefault();
-            var client = _context.Clients.Where(x => x.IdentityUserId == identityUser.Id).FirstOrDefault(); 
-
-            return client.FirstName + " " + client.LastName;
-        }
-       
-
-        private bool ClientExists(int id)
-        {
-            return _context.Clients.Any(e => e.ClientId == id);
+            return _clientService.GetUserNameById(userName);
         }
     }
 }

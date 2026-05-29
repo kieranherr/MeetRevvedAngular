@@ -41,12 +41,12 @@ namespace MeetRevvedUp_WebAPI.Models
         public int ClientId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public long PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
         public int Age { get; set; }
         public string City { get; set; }
         public string State { get; set; }
         public string IdentityUserId { get; set; }
-        public IdentityUser IdentityUser { get; set; }
+        public IdentityUser? IdentityUser { get; set; }
         public int MeetId { get; set; }
         public bool HasCar { get; set; }
     }
@@ -71,5 +71,24 @@ namespace MeetRevvedUp_WebAPI.Models
         public string Mods { get; set; }
         public int AvgRating { get; set; }
         public int MeetId { get; set; }
+    }
+
+    public class RegisterRequest
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class LoginRequest
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class AuthResponse
+    {
+        public string Token { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
 }

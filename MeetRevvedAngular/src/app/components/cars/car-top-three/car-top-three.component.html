@@ -1,0 +1,98 @@
+<div class="page-wrapper">
+  <div *ngIf="loading" class="state-message">Loading top cars...</div>
+  <div *ngIf="error" class="state-message error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error">
+    <div class="page-header">
+      <h2>🏆 Top Three Cars</h2>
+    </div>
+
+    <div *ngIf="hasEntries; else noEntries">
+      <div class="podium-grid">
+        <div class="podium-card" *ngFor="let car of cars; let i = index" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+          <div class="podium-rank">
+            <span *ngIf="i === 0">🥇</span>
+            <span *ngIf="i === 1">🥈</span>
+            <span *ngIf="i === 2">🥉</span>
+          </div>
+          <h3 class="car-name">{{ car.year }} {{ car.make }} {{ car.model }}</h3>
+          <div class="car-stats">
+            <div class="stat">
+              <span class="stat-label">Mileage</span>
+              <span class="stat-value">{{ car.mileage | number }} mi</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Mods</span>
+              <span class="stat-value">{{ car.mods || '—' }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Rating</span>
+              <span class="stat-value rating">⭐ {{ car.avgRating | number:'1.1-1' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <button class="btn btn-secondary" (click)="backToMeet()">← Back to Meet</button>
+      </div>
+    </div>
+
+    <ng-template #noEntries>
+      <div class="empty-state">
+        <div class="empty-icon">🚗</div>
+        <h3>No Cars Yet</h3>
+        <p>No one with a car has RSVP'd yet.</p>
+        <button class="btn btn-secondary" (click)="backToMeet()">← Back to Meet</button>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+  }
+  .page-header { max-width: 900px; margin: 0 auto 2rem; }
+  .page-header h2 { font-size: 1.75rem; margin: 0; }
+  .podium-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .podium-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border-top: 4px solid #334;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .podium-card.gold { border-top-color: #f0c040; }
+  .podium-card.silver { border-top-color: #c0c0c0; }
+  .podium-card.bronze { border-top-color: #cd7f32; }
+  .podium-rank { font-size: 2rem; }
+  .car-name { font-size: 1.1rem; margin: 0; color: #fff; }
+  .car-stats { display: flex; flex-direction: column; gap: 0.5rem; }
+  .stat { display: flex; justify-content: space-between; }
+  .stat-label { color: #aaa; font-size: 0.85rem; }
+  .stat-value { color: #fff; font-size: 0.9rem; font-weight: 500; }
+  .stat-value.rating { color: #f0c040; }
+  .page-footer { max-width: 900px; margin: 2rem auto 0; }
+  .empty-state { text-align: center; padding: 4rem 2rem; max-width: 480px; margin: 0 auto; }
+  .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
+  .empty-state h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .empty-state p { color: #aaa; margin-bottom: 1.5rem; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .state-message.error { color: #e94560; }
+</style>

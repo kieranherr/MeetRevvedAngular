@@ -13,12 +13,10 @@ namespace MeetRevvedUp_WebAPI.Interfaces
         int ClientId { get; set; }
         string FirstName { get; set; }
         string LastName { get; set; }
-        long PhoneNumber { get; set; }
+        string PhoneNumber { get; set; }
         int Age { get; set; }
         string City { get; set; }
         string State {  get; set; }
-        
         string IdentityUserId { get; set; }
-        IdentityUser IdentityUser { get; set; }
     }
 }

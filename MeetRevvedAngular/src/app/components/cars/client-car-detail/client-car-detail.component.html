@@ -1,0 +1,86 @@
+<div class="page-wrapper">
+  <div *ngIf="loading" class="state-message">Loading car details...</div>
+  <div *ngIf="error" class="state-message error">{{ error }}</div>
+
+  <div class="card" *ngIf="car && !loading">
+    <div class="car-hero" *ngIf="car.imageLocation">
+      <img [src]="car.imageLocation" alt="{{ car.year }} {{ car.make }} {{ car.model }}" class="car-image" />
+    </div>
+
+    <div class="car-header">
+      <h2 class="card-title">{{ car.year }} {{ car.make }} {{ car.model }}</h2>
+      <span class="rating-badge">⭐ {{ car.avgRating | number:'1.1-1' }}</span>
+    </div>
+
+    <hr />
+
+    <dl class="details-list">
+      <div class="detail-row">
+        <dt>VIN</dt>
+        <dd>{{ car.vin }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Make</dt>
+        <dd>{{ car.make }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Model</dt>
+        <dd>{{ car.model }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Year</dt>
+        <dd>{{ car.year }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Mileage</dt>
+        <dd>{{ car.mileage | number }} mi</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Mods</dt>
+        <dd>{{ car.mods || '—' }}</dd>
+      </div>
+    </dl>
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="rateCar()">Rate This Car</button>
+      <button class="btn btn-secondary" (click)="goToMeets()">Go To Meets</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 3rem 1rem;
+    background: #1a1a2e;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+  }
+  .car-hero { margin-bottom: 1.5rem; }
+  .car-image { width: 100%; max-height: 280px; object-fit: cover; border-radius: 10px; }
+  .car-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+  .card-title { font-size: 1.5rem; margin: 0; }
+  .rating-badge { background: #0f3460; color: #f0c040; padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600; }
+  hr { border-color: #334; margin: 1rem 0 1.5rem; }
+  .details-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+  .detail-row { display: flex; justify-content: space-between; }
+  dt { color: #aaa; font-weight: 500; }
+  dd { color: #fff; margin: 0; text-align: right; max-width: 60%; word-break: break-word; }
+  .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .state-message.error { color: #e94560; }
+</style>

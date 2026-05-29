@@ -1,0 +1,51 @@
+<div class="page-wrapper">
+  <div class="card" *ngIf="garage; else loading">
+    <h2 class="card-title">✏️ Edit Garage</h2>
+    <hr />
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <p class="info-text">Garage ID: <strong>{{ garage.garageId }}</strong></p>
+    <p class="info-text">Car ID: <strong>{{ garage.carId }}</strong></p>
+    <p class="subtitle">To change your car, update your car from the Cars section.</p>
+    <div class="actions">
+      <button class="btn btn-primary" (click)="save()" [disabled]="submitting">
+        {{ submitting ? 'Saving...' : 'Save' }}
+      </button>
+      <button class="btn btn-secondary" (click)="goBack()">Cancel</button>
+    </div>
+  </div>
+  <ng-template #loading>
+    <p class="loading-text">Loading...</p>
+  </ng-template>
+</div>
+
+<style>
+  .page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 3rem 1rem;
+    background: #1a1a2e;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+  }
+  .card-title { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .subtitle { color: #aaa; font-size: 0.875rem; margin-bottom: 1.5rem; }
+  .info-text { margin: 0.25rem 0; color: #ccc; }
+  hr { border-color: #334; margin-bottom: 1.5rem; }
+  .alert-error { background: #5c1c1c; color: #ff8a8a; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.9rem; }
+  .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #334; color: #eee; }
+  .btn:hover:not(:disabled) { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .loading-text { color: #aaa; text-align: center; margin-top: 4rem; }
+</style>

@@ -1,0 +1,44 @@
+<div class="page-wrapper">
+  <div class="card">
+    <h2 class="card-title">🏠 Create Your Garage</h2>
+    <p class="subtitle">This will link your registered car to your garage profile.</p>
+    <hr />
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <div class="actions">
+      <button class="btn btn-primary" (click)="createGarage()" [disabled]="submitting">
+        {{ submitting ? 'Creating...' : 'Create Garage' }}
+      </button>
+      <button class="btn btn-secondary" (click)="goBack()">Back to Profile</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 3rem 1rem;
+    background: #1a1a2e;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+  }
+  .card-title { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .subtitle { color: #aaa; margin-bottom: 1rem; font-size: 0.95rem; }
+  hr { border-color: #334; margin-bottom: 1.5rem; }
+  .alert-error { background: #5c1c1c; color: #ff8a8a; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.9rem; }
+  .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #334; color: #eee; }
+  .btn:hover:not(:disabled) { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>

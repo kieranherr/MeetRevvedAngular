@@ -1,0 +1,54 @@
+<div class="page-wrapper">
+  <div class="form-card">
+    <h2>RSVP!</h2>
+    <hr class="divider" />
+
+    <div *ngIf="loading" class="state-message">Loading...</div>
+    <div *ngIf="error" class="error-msg">{{ error }}</div>
+
+    <div *ngIf="meet && !loading">
+      <p class="rsvp-text">
+        You are RSVPing to <strong>{{ meet.meetName }}</strong> on {{ meet.meetDate }} at {{ meet.meetTime }}.
+      </p>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" (click)="confirmRSVP()" [disabled]="submitting">
+          {{ submitting ? 'RSVPing...' : 'Confirm RSVP' }}
+        </button>
+        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .form-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  h2 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+  .divider { border-color: #0f3460; margin-bottom: 1.5rem; }
+  .rsvp-text { color: #ccc; margin-bottom: 1.5rem; font-size: 1rem; line-height: 1.5; }
+  .rsvp-text strong { color: #fff; }
+  .form-actions { display: flex; gap: 0.75rem; }
+  .state-message { text-align: center; padding: 2rem; color: #aaa; }
+  .error-msg { color: #e94560; margin-bottom: 1rem; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>

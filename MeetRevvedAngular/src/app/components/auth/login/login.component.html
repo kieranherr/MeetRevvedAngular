@@ -1,0 +1,107 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <h2>{{ isRegisterMode ? 'Create Account' : 'Sign In' }}</h2>
+    <p class="subtitle">{{ isRegisterMode ? 'Join MeetRevvedUp' : 'Welcome back' }}</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+        />
+        <span
+          class="field-error"
+          *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+        >Enter a valid email.</span>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+        <span
+          class="field-error"
+          *ngIf="form.get('password')?.invalid && form.get('password')?.touched"
+        >Password must be at least 6 characters.</span>
+      </div>
+
+      <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Please wait…' : (isRegisterMode ? 'Create Account' : 'Sign In') }}
+      </button>
+    </form>
+
+    <p class="toggle-link">
+      {{ isRegisterMode ? 'Already have an account?' : "Don't have an account?" }}
+      <a (click)="toggleMode()">{{ isRegisterMode ? 'Sign In' : 'Register' }}</a>
+    </p>
+  </div>
+</div>
+
+<style>
+  .login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #1a1a2e;
+  }
+  .login-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+  }
+  h2 { margin: 0 0 0.25rem; font-size: 1.75rem; }
+  .subtitle { margin: 0 0 1.5rem; color: #aaa; font-size: 0.9rem; }
+  .field { display: flex; flex-direction: column; margin-bottom: 1rem; }
+  .field label { margin-bottom: 0.4rem; font-size: 0.85rem; color: #ccc; }
+  .field input {
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #334;
+    background: #0f3460;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+  }
+  .field input:focus { border-color: #e94560; }
+  .field-error { color: #e94560; font-size: 0.78rem; margin-top: 0.25rem; }
+  .error-banner {
+    background: #e9456022;
+    border: 1px solid #e94560;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    color: #e94560;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #e94560;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  button:hover:not(:disabled) { background: #c73652; }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .toggle-link { text-align: center; margin-top: 1.25rem; font-size: 0.875rem; color: #aaa; }
+  .toggle-link a { color: #e94560; cursor: pointer; text-decoration: underline; }
+</style>

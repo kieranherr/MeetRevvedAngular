@@ -1,0 +1,115 @@
+<div class="page-wrapper">
+  <div class="form-card">
+    <h2>Edit Meet</h2>
+    <hr class="divider" />
+
+    <div *ngIf="loading" class="state-message">Loading...</div>
+    <div *ngIf="error" class="error-msg">{{ error }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!loading">
+      <div class="form-group">
+        <label>Meet Name</label>
+        <input formControlName="meetName" class="form-input" />
+        <span class="field-error" *ngIf="form.get('meetName')?.invalid && form.get('meetName')?.touched">
+          Meet name is required.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>Street</label>
+        <input formControlName="street" class="form-input" />
+        <span class="field-error" *ngIf="form.get('street')?.invalid && form.get('street')?.touched">
+          Street is required.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>City</label>
+        <input formControlName="city" class="form-input" />
+        <span class="field-error" *ngIf="form.get('city')?.invalid && form.get('city')?.touched">
+          City is required.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>State</label>
+        <input formControlName="state" class="form-input" maxlength="2" />
+        <span class="field-error" *ngIf="form.get('state')?.invalid && form.get('state')?.touched">
+          State is required (2 characters).
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>Zip</label>
+        <input formControlName="zip" class="form-input" type="number" />
+        <span class="field-error" *ngIf="form.get('zip')?.invalid && form.get('zip')?.touched">
+          Zip is required.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>Meet Time</label>
+        <input formControlName="meetTime" class="form-input" />
+        <span class="field-error" *ngIf="form.get('meetTime')?.invalid && form.get('meetTime')?.touched">
+          Meet time is required.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>Meet Date</label>
+        <input formControlName="meetDate" class="form-input" />
+        <span class="field-error" *ngIf="form.get('meetDate')?.invalid && form.get('meetDate')?.touched">
+          Meet date is required.
+        </span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="submitting">
+          {{ submitting ? 'Saving...' : 'Save Changes' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .form-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  h2 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+  .divider { border-color: #0f3460; margin-bottom: 1.5rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+  .form-group label { font-size: 0.85rem; color: #aaa; }
+  .form-input {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #1a1a2e;
+    color: #eee;
+    font-size: 0.95rem;
+  }
+  .field-error { color: #e94560; font-size: 0.8rem; }
+  .error-msg { color: #e94560; margin-bottom: 1rem; }
+  .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>

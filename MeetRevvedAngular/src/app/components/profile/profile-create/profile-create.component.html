@@ -1,0 +1,131 @@
+<div class="wrapper">
+  <div class="card">
+    <h2>Create Profile</h2>
+    <p class="subtitle">Tell us about yourself</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+      <div class="row">
+        <div class="field">
+          <label for="firstName">First Name</label>
+          <input id="firstName" type="text" formControlName="firstName" placeholder="Jane" />
+          <span class="field-error" *ngIf="form.get('firstName')?.invalid && form.get('firstName')?.touched">
+            Required.
+          </span>
+        </div>
+        <div class="field">
+          <label for="lastName">Last Name</label>
+          <input id="lastName" type="text" formControlName="lastName" placeholder="Doe" />
+          <span class="field-error" *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched">
+            Required.
+          </span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="age">Age</label>
+          <input id="age" type="number" formControlName="age" placeholder="25" min="16" max="120" />
+          <span class="field-error" *ngIf="form.get('age')?.invalid && form.get('age')?.touched">
+            Must be between 16 and 120.
+          </span>
+        </div>
+        <div class="field">
+          <label for="phoneNumber">Phone Number</label>
+          <input id="phoneNumber" type="tel" formControlName="phoneNumber" placeholder="10 digits, no dashes" (keypress)="checkValue($event)"/>
+          <span class="field-error" *ngIf="form.get('phoneNumber')?.invalid && form.get('phoneNumber')?.touched">
+            Enter a 10-digit phone number.
+          </span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="city">City</label>
+          <input id="city" type="text" formControlName="city" placeholder="Chicago" />
+          <span class="field-error" *ngIf="form.get('city')?.invalid && form.get('city')?.touched">
+            Required.
+          </span>
+        </div>
+        <div class="field">
+          <label for="state">State</label>
+          <select id="state" formControlName="state">
+            <option value="" disabled selected>Select state</option>
+            <option *ngFor="let s of states" [value]="s">{{ s }}</option>
+          </select>
+          <span class="field-error" *ngIf="form.get('state')?.invalid && form.get('state')?.touched">
+            Required.
+          </span>
+        </div>
+      </div>
+
+      <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Saving...' : 'Create Profile' }}
+      </button>
+
+    </form>
+  </div>
+</div>
+
+<style>
+  .wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #1a1a2e;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+  }
+  h2 { margin: 0 0 0.25rem; font-size: 1.75rem; }
+  .subtitle { margin: 0 0 1.75rem; color: #aaa; font-size: 0.9rem; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .field { display: flex; flex-direction: column; margin-bottom: 1rem; }
+  .field label { margin-bottom: 0.4rem; font-size: 0.85rem; color: #ccc; }
+  .field input,
+  .field select {
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #334;
+    background: #0f3460;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+  }
+  .field input:focus,
+  .field select:focus { border-color: #e94560; }
+  .field select option { background: #16213e; }
+  .field-error { color: #e94560; font-size: 0.78rem; margin-top: 0.25rem; }
+  .error-banner {
+    background: #e9456022;
+    border: 1px solid #e94560;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    color: #e94560;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #e94560;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+  }
+  button:hover:not(:disabled) { background: #c73652; }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+</style>

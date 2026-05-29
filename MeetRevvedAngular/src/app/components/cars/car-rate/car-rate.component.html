@@ -1,0 +1,89 @@
+<div class="page-wrapper">
+  <div *ngIf="loading" class="state-message">Loading...</div>
+  <div *ngIf="error && !loading" class="state-message error">{{ error }}</div>
+
+  <div class="card" *ngIf="!loading && car">
+    <div class="star-icon">⭐</div>
+    <h2 class="card-title">Rate This Car</h2>
+    <p class="car-name">{{ car.year }} {{ car.make }} {{ car.model }}</p>
+    <p class="current-rating">Current Rating: <strong>{{ car.avgRating | number:'1.1-1' }}</strong></p>
+    <hr />
+
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <form [formGroup]="rateForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="newRate">Your Rating (1–10)</label>
+        <input
+          id="newRate"
+          type="number"
+          formControlName="newRate"
+          class="form-control"
+          min="1"
+          max="10"
+          placeholder="Enter a number from 1 to 10"
+        />
+        <span class="field-error" *ngIf="rateForm.get('newRate')?.invalid && rateForm.get('newRate')?.touched">
+          Please enter a rating between 1 and 10.
+        </span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="submitting">
+          {{ submitting ? 'Submitting...' : 'Submit Rating' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="goToMeets()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 3rem 1rem;
+    background: #1a1a2e;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+    text-align: center;
+  }
+  .star-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .card-title { font-size: 1.75rem; margin-bottom: 0.25rem; }
+  .car-name { color: #aaa; margin-bottom: 0.25rem; }
+  .current-rating { color: #f0c040; margin-bottom: 1rem; }
+  hr { border-color: #334; margin-bottom: 1.5rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1.25rem; text-align: left; }
+  label { font-size: 0.9rem; color: #aaa; font-weight: 500; }
+  .form-control {
+    background: #0f3460;
+    border: 1px solid #334;
+    border-radius: 8px;
+    color: #fff;
+    padding: 0.65rem 0.9rem;
+    font-size: 1.1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+  }
+  .form-control:focus { border-color: #e94560; }
+  .field-error { color: #e94560; font-size: 0.8rem; }
+  .alert-error { background: rgba(233,69,96,0.15); color: #e94560; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.9rem; }
+  .form-actions { display: flex; gap: 0.75rem; justify-content: center; }
+  .btn { padding: 0.55rem 1.4rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover:not(:disabled) { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .state-message.error { color: #e94560; }
+</style>

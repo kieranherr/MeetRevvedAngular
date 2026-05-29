@@ -1,0 +1,106 @@
+<div class="page-wrapper">
+  <div *ngIf="loading" class="state-message">Loading meet details...</div>
+  <div *ngIf="error" class="state-message error">{{ error }}</div>
+
+  <div *ngIf="meet && !loading">
+    <div class="page-header">
+      <h2>{{ meet.meetName }}</h2>
+      <button class="btn btn-secondary" (click)="goBack()">← Back to Meets</button>
+    </div>
+
+    <div class="detail-card">
+      <dl class="detail-list">
+        <div class="detail-row">
+          <dt>Date</dt>
+          <dd>{{ meet.meetDate }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Time</dt>
+          <dd>{{ meet.meetTime }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Street</dt>
+          <dd>{{ meet.street }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>City</dt>
+          <dd>{{ meet.city }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>State</dt>
+          <dd>{{ meet.state }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Zip</dt>
+          <dd>{{ meet.zip }}</dd>
+        </div>
+      </dl>
+
+      <div class="action-group">
+        <button class="btn btn-primary" (click)="goToRSVPIndex()">Who's Going?</button>
+        <button class="btn btn-primary" (click)="toggleRSVP()">
+          {{ meet.isRSVP ? 'Remove RSVP' : 'RSVP' }}
+        </button>
+        <button class="btn btn-primary" (click)="goToTopThree()">Top 3 Cars</button>
+        <button class="btn btn-primary" (click)="goToComments()">Comments</button>
+        <button class="btn btn-danger" (click)="sendSOS()">🚨 SOS</button>
+      </div>
+
+      <div class="action-group" *ngIf="meet.isOwner">
+        <button class="btn btn-secondary" (click)="editMeet()">Edit Meet</button>
+        <button class="btn btn-danger" (click)="deleteMeet()">Delete Meet</button>
+      </div>
+    </div>
+
+    <div id="detail-map" class="map-container"></div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+  }
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 0 auto 1.5rem;
+  }
+  .page-header h2 { font-size: 1.75rem; margin: 0; }
+  .detail-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .detail-list { display: flex; flex-direction: column; gap: 0.5rem; margin: 0 0 1.5rem; }
+  .detail-row { display: flex; gap: 1rem; }
+  .detail-row dt { width: 80px; color: #aaa; font-size: 0.9rem; flex-shrink: 0; }
+  .detail-row dd { color: #fff; margin: 0; }
+  .action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  .map-container {
+    max-width: 800px;
+    margin: 0 auto;
+    height: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .state-message.error { color: #e94560; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn-danger { background: #b91c1c; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+</style>

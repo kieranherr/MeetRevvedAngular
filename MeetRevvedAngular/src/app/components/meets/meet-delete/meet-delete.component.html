@@ -1,0 +1,65 @@
+<div class="page-wrapper">
+  <div class="form-card">
+    <h2>Delete Meet</h2>
+    <hr class="divider" />
+
+    <div *ngIf="loading" class="state-message">Loading...</div>
+    <div *ngIf="error" class="error-msg">{{ error }}</div>
+
+    <div *ngIf="meet && !loading">
+      <p class="confirm-text">Are you sure you want to delete this meet?</p>
+
+      <dl class="detail-list">
+        <div class="detail-row"><dt>Name</dt><dd>{{ meet.meetName }}</dd></div>
+        <div class="detail-row"><dt>Date</dt><dd>{{ meet.meetDate }}</dd></div>
+        <div class="detail-row"><dt>Time</dt><dd>{{ meet.meetTime }}</dd></div>
+        <div class="detail-row"><dt>Street</dt><dd>{{ meet.street }}</dd></div>
+        <div class="detail-row"><dt>City</dt><dd>{{ meet.city }}</dd></div>
+        <div class="detail-row"><dt>State</dt><dd>{{ meet.state }}</dd></div>
+        <div class="detail-row"><dt>Zip</dt><dd>{{ meet.zip }}</dd></div>
+      </dl>
+
+      <div class="form-actions">
+        <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+          {{ deleting ? 'Deleting...' : 'Delete' }}
+        </button>
+        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .form-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  h2 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+  .divider { border-color: #0f3460; margin-bottom: 1.5rem; }
+  .confirm-text { color: #f0a040; margin-bottom: 1.25rem; font-size: 1rem; }
+  .detail-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .detail-row { display: flex; gap: 1rem; }
+  .detail-row dt { width: 70px; color: #aaa; font-size: 0.9rem; flex-shrink: 0; }
+  .detail-row dd { color: #fff; margin: 0; }
+  .form-actions { display: flex; gap: 0.75rem; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .error-msg { color: #e94560; margin-bottom: 1rem; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+  .btn-danger { background: #b91c1c; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>

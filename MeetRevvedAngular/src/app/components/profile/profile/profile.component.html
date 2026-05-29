@@ -1,0 +1,37 @@
+<div class="profile-wrapper">
+  <div class="profile-card">
+    <h2>Welcome to MeetRevvedUp, {{ fullName }}!</h2>
+    <p class="email">{{ email }}</p>
+    <hr />
+    <p class="hint">Your garages and cars will appear here.</p>
+      <button type="button" class="btn btn-primary me-1" (click)="navigateToEdit()">Edit Profile</button>
+      <button type="button" class="btn btn-primary me-1" (click)="navigateToCars()">Go to your Cars</button>
+      <button type="button" class="btn btn-primary me-1" (click)="navigateToMeets()">Go to the Meets</button>
+      <button type="button" class="btn btn-danger" (click)="logout()">Sign Out</button>
+  </div>
+</div>
+
+<style>
+  .profile-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    min-height: 100vh;
+    background: #1a1a2e;
+  }
+  .profile-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 750px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+    text-align: center;
+  }
+  h2 { margin: 0 0 0.5rem; font-size: 1.75rem; }
+  .email { color: #aaa; margin: 0 0 1.25rem; font-size: 0.95rem; }
+  hr { border-color: #334; margin-bottom: 1.25rem; }
+  .hint { color: #777; font-size: 0.875rem; margin-bottom: 1.5rem; }
+
+</style>

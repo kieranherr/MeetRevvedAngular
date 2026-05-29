@@ -1,0 +1,84 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <h2>🚗 About The Cars</h2>
+  </div>
+
+  <div *ngIf="loading" class="state-message">Loading cars...</div>
+  <div *ngIf="error" class="state-message error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error">
+    <div *ngIf="cars.length === 0" class="empty-state">
+      <p>No cars found in this garage.</p>
+    </div>
+
+    <div class="table-wrapper" *ngIf="cars.length > 0">
+      <table class="car-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Avg Rating</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let car of cars">
+            <td>{{ car.year }}</td>
+            <td>{{ car.make }}</td>
+            <td>{{ car.model }}</td>
+            <td><span class="rating">⭐ {{ car.avgRating | number:'1.1-1' }}</span></td>
+            <td>
+              <button class="btn btn-primary btn-sm" (click)="viewCar(car.carId)">View Car</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="page-footer">
+      <button class="btn btn-secondary" (click)="goToGarage()">← Back to Garage</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+  }
+  .page-header { max-width: 900px; margin: 0 auto 2rem; }
+  .page-header h2 { font-size: 1.75rem; margin: 0; }
+  .table-wrapper { max-width: 900px; margin: 0 auto; overflow-x: auto; }
+  .car-table { width: 100%; border-collapse: collapse; }
+  .car-table th {
+    background: #0f3460;
+    color: #aaa;
+    font-weight: 600;
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .car-table td {
+    background: #16213e;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #1e2a4a;
+    font-size: 0.95rem;
+  }
+  .car-table tr:last-child td { border-bottom: none; }
+  .car-table tr:hover td { background: #1c2b50; }
+  .rating { color: #f0c040; }
+  .page-footer { max-width: 900px; margin: 2rem auto 0; }
+  .empty-state { text-align: center; padding: 3rem; color: #aaa; max-width: 900px; margin: 0 auto; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .state-message.error { color: #e94560; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+  .btn-sm { padding: 0.35rem 0.85rem; font-size: 0.8rem; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+</style>

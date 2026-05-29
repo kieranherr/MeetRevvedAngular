@@ -1,0 +1,80 @@
+<div class="page-wrapper">
+  <div class="form-card">
+    <h2>Add a Comment</h2>
+    <hr class="divider" />
+
+    <div *ngIf="error" class="error-msg">{{ error }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-group">
+        <label for="commentBody">Comment</label>
+        <textarea
+          id="commentBody"
+          formControlName="commentBody"
+          rows="5"
+          placeholder="What's on your mind?"
+          class="form-control"
+          [class.invalid]="form.get('commentBody')?.invalid && form.get('commentBody')?.touched"
+        ></textarea>
+        <div class="validation-msg" *ngIf="form.get('commentBody')?.errors?.['required'] && form.get('commentBody')?.touched">
+          Comment is required.
+        </div>
+        <div class="validation-msg" *ngIf="form.get('commentBody')?.errors?.['maxlength'] && form.get('commentBody')?.touched">
+          Comment cannot exceed 500 characters.
+        </div>
+        <div class="char-count">{{ form.get('commentBody')?.value?.length || 0 }} / 500</div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting">
+          {{ submitting ? 'Posting...' : 'Post Comment' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .form-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 540px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  h2 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+  .divider { border-color: #0f3460; margin-bottom: 1.5rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem; }
+  label { font-size: 0.85rem; color: #aaa; }
+  .form-control {
+    background: #0f3460;
+    border: 1px solid #1a1a2e;
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    color: #fff;
+    font-size: 0.95rem;
+    resize: vertical;
+  }
+  .form-control:focus { outline: none; border-color: #e94560; }
+  .form-control.invalid { border-color: #e94560; }
+  .validation-msg { color: #e94560; font-size: 0.8rem; }
+  .char-count { text-align: right; color: #666; font-size: 0.78rem; }
+  .form-actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+  .error-msg { color: #e94560; margin-bottom: 1rem; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
