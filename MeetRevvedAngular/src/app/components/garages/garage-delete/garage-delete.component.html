@@ -1,0 +1,60 @@
+<div class="page-wrapper">
+  <div class="card" *ngIf="garage; else loading">
+    <h2 class="card-title">🗑️ Delete Garage</h2>
+    <p class="warning">Are you sure you want to delete this garage? This action cannot be undone.</p>
+    <hr />
+    <dl class="details-list">
+      <div class="detail-row">
+        <dt>Garage ID</dt>
+        <dd>{{ garage.garageId }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Car</dt>
+        <dd>{{ garage.car?.year }} {{ garage.car?.make }} {{ garage.car?.model }}</dd>
+      </div>
+    </dl>
+    <div class="actions">
+      <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="submitting">
+        {{ submitting ? 'Deleting...' : 'Delete' }}
+      </button>
+      <button class="btn btn-secondary" (click)="goBack()">Cancel</button>
+    </div>
+  </div>
+  <ng-template #loading>
+    <p class="loading-text">Loading...</p>
+  </ng-template>
+</div>
+
+<style>
+  .page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 3rem 1rem;
+    background: #1a1a2e;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+  }
+  .card-title { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .warning { color: #ff8a8a; margin-bottom: 1rem; font-size: 0.95rem; }
+  hr { border-color: #334; margin-bottom: 1.5rem; }
+  .details-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+  .detail-row { display: flex; justify-content: space-between; }
+  dt { color: #aaa; font-weight: 500; }
+  dd { color: #fff; margin: 0; }
+  .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+  .btn-danger { background: #c0392b; color: #fff; }
+  .btn-secondary { background: #334; color: #eee; }
+  .btn:hover:not(:disabled) { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .loading-text { color: #aaa; text-align: center; margin-top: 4rem; }
+</style>

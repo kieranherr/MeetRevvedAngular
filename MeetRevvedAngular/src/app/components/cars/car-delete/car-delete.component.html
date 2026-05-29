@@ -1,0 +1,89 @@
+<div class="page-wrapper">
+  <div *ngIf="loading" class="state-message">Loading...</div>
+  <div *ngIf="error && !loading" class="state-message error">{{ error }}</div>
+
+  <div class="card" *ngIf="car && !loading">
+    <div class="warning-icon">⚠️</div>
+    <h2 class="card-title">Delete Car</h2>
+    <p class="subtitle">Are you sure you want to delete this car? This action cannot be undone.</p>
+    <hr />
+
+    <dl class="details-list">
+      <div class="detail-row">
+        <dt>VIN</dt>
+        <dd>{{ car.vin }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Make</dt>
+        <dd>{{ car.make }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Model</dt>
+        <dd>{{ car.model }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Year</dt>
+        <dd>{{ car.year }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Mileage</dt>
+        <dd>{{ car.mileage | number }} mi</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Mods</dt>
+        <dd>{{ car.mods || '—' }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Avg Rating</dt>
+        <dd>⭐ {{ car.avgRating | number:'1.1-1' }}</dd>
+      </div>
+    </dl>
+
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+    <div class="actions">
+      <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+        {{ deleting ? 'Deleting...' : 'Yes, Delete' }}
+      </button>
+      <button class="btn btn-secondary" (click)="goBack()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 3rem 1rem;
+    background: #1a1a2e;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    color: #eee;
+    text-align: center;
+  }
+  .warning-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .card-title { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .subtitle { color: #aaa; font-size: 0.95rem; margin-bottom: 1rem; }
+  hr { border-color: #334; margin-bottom: 1.5rem; }
+  .details-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; text-align: left; }
+  .detail-row { display: flex; justify-content: space-between; }
+  dt { color: #aaa; font-weight: 500; }
+  dd { color: #fff; margin: 0; }
+  .actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+  .alert-error { background: rgba(233,69,96,0.15); color: #e94560; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.9rem; }
+  .btn { padding: 0.55rem 1.4rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+  .btn-danger { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn:hover:not(:disabled) { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .state-message.error { color: #e94560; }
+</style>

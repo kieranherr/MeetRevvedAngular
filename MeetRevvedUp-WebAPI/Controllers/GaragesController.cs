@@ -1,181 +1,64 @@
-﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using MeetRevvedUp_WebAPI.Interfaces;
 using MeetRevvedUp_WebAPI.Models;
 using System.Security.Claims;
 
 namespace MeetRevvedUp_WebAPI.Controllers
 {
-    [Authorize(Roles = "CarGuy")]
-    public class GaragesController : Controller
+    [Route("api/garages")]
+    [ApiController]
+    public class GaragesController : ControllerBase
     {
-        private readonly RevvedUpContext _context;
+        private readonly IGaragesService _garagesService;
 
-        public GaragesController(RevvedUpContext context)
+        public GaragesController(IGaragesService garagesService)
         {
-            _context = context;
+            _garagesService = garagesService;
         }
 
-        // GET: Garages
-        public async Task<IActionResult> Index()
+        // GET: api/Garages/user/{userId}
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<Garage>> GetGarageByUserId(string userId)
         {
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = await _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
-            var garage = await _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefaultAsync();
-            if(garage == null)
-            {
-                return RedirectToAction("Create");
-            }
-                return View("Details", client);
+            var garage = await _garagesService.GetGarageByUserIdAsync(userId);
+            if (garage == null) return NotFound();
+            return Ok(garage);
         }
 
-       
-
-        // GET: Garages/Create
-        public IActionResult Create()
+        // GET: api/Garages/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Garage>> GetGarage(int id)
         {
-            return View();
-        }
-        // GET: Cars/Create
-        public IActionResult CreateCar()
-        {
-            return View();
+            var garage = await _garagesService.GetGarageByIdAsync(id);
+            if (garage == null) return NotFound();
+            return Ok(garage);
         }
 
-        // POST: Cars/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCar([Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,ImageLocation,AvgRating")] Car car)
+        // POST: api/Garages/{clientId}
+        [HttpPost("{clientId}")]
+        public async Task<ActionResult<Garage>> CreateGarage(int clientId)
         {
-            if (ModelState.IsValid)
-            {
-                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                car.IdentityUserId = userId;
-                _context.Add(car);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(car);
-        }
-        // POST: Garages/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("GarageId")] Garage garage)
-        {
-            ModelState.Remove("ClientId");
-            ModelState.Remove("CarId");
-            ModelState.Remove("IdentityUserId");
-            ModelState.Remove("Client");
-            ModelState.Remove("Car");
-            ModelState.Remove("IdentityUser");
-
-            if (ModelState.IsValid)
-            {
-                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-                garage.ClientId = client.ClientId;
-                garage.IdentityUserId = userId;
-                var car = _context.Cars.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-                if (car == null)
-                {
-                    return RedirectToAction("CreateCar");
-                }
-                garage.CarId = car.CarId;
-
-                _context.Add(garage);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(garage);
+            var garage = await _garagesService.CreateGarageAsync(clientId);
+            if (garage == null) return BadRequest();
+            return Ok(garage);
         }
 
-        // GET: Garages/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // PUT: api/Garages/{id}
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Garage>> UpdateGarage(int id, Garage garage)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var garage = await _context.Garages.FindAsync(id);
-            if (garage == null)
-            {
-                return NotFound();
-            }
-            return View(garage);
+            var updated = await _garagesService.UpdateGarageAsync(id, garage);
+            if (updated == null) return BadRequest();
+            return Ok(updated);
         }
 
-        // POST: Garages/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("GarageId")] Garage garage)
+        // DELETE: api/Garages/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteGarage(int id)
         {
-            if (id != garage.GarageId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(garage);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GarageExists(garage.GarageId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(garage);
-        }
-
-        // GET: Garages/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var garage = await _context.Garages
-                .FirstOrDefaultAsync(m => m.GarageId == id);
-            if (garage == null)
-            {
-                return NotFound();
-            }
-
-            return View(garage);
-        }
-
-        // POST: Garages/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var garage = await _context.Garages.FindAsync(id);
-            _context.Garages.Remove(garage);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool GarageExists(int id)
-        {
-            return _context.Garages.Any(e => e.GarageId == id);
+            var deleted = await _garagesService.DeleteGarageAsync(id);
+            if (!deleted) return NotFound();
+            return NoContent();
         }
     }
 }

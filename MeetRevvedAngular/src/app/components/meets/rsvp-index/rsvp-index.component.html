@@ -1,0 +1,105 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <h2>🎟 Who's Going?</h2>
+    <button class="btn btn-secondary" (click)="goBack()">← Back to Meet</button>
+  </div>
+
+  <div *ngIf="loading" class="state-message">Loading RSVPs...</div>
+  <div *ngIf="error" class="state-message error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error">
+    <div *ngIf="clients.length === 0 || (clients.length === 1 && clients[0].clientId === 0)" class="empty-state">
+      <h3>No RSVPs Yet</h3>
+      <p>Be the first to RSVP to this meet!</p>
+      <button class="btn btn-secondary" (click)="goBack()">Back to Meet</button>
+    </div>
+
+    <table class="rsvp-table" *ngIf="clients.length > 0 && clients[0].clientId !== 0">
+      <thead>
+        <tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Age</th>
+          <th>City</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let client of clients">
+          <td>{{ client.firstName }}</td>
+          <td>{{ client.lastName }}</td>
+          <td>{{ client.age }}</td>
+          <td>{{ client.city }}</td>
+          <td class="action-cell">
+            <button *ngIf="client.hasCar" class="btn btn-primary btn-sm" (click)="viewCar(client.clientId)">
+              View Car
+            </button>
+            <button *ngIf="!client.hasCar" class="btn btn-warning btn-sm" disabled>
+              No Car
+            </button>
+            <button class="btn btn-secondary btn-sm" (click)="addFriend(client.clientId)">
+              Add Friend
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="page-footer" *ngIf="clients.length > 0 && clients[0].clientId !== 0">
+      <button class="btn btn-secondary" (click)="goBack()">← Back to Meet</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+  }
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto 1.5rem;
+  }
+  .page-header h2 { font-size: 1.75rem; margin: 0; }
+  .rsvp-table {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 2rem;
+    border-collapse: collapse;
+    background: #16213e;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .rsvp-table th {
+    background: #0f3460;
+    color: #eee;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  .rsvp-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #1a1a2e;
+    color: #ccc;
+    font-size: 0.9rem;
+  }
+  .action-cell { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .page-footer { max-width: 900px; margin: 0 auto; }
+  .empty-state { text-align: center; padding: 3rem; color: #aaa; }
+  .empty-state h3 { color: #fff; margin-bottom: 0.5rem; }
+  .empty-state p { margin-bottom: 1.5rem; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .state-message.error { color: #e94560; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+  .btn-sm { padding: 0.35rem 0.85rem; font-size: 0.8rem; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn-warning { background: #b45309; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>

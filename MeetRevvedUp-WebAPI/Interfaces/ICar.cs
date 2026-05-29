@@ -10,6 +10,7 @@ namespace MeetRevvedUp_WebAPI.Interfaces
 {
     public interface ICar
     {
+        [Key]
         int CarId { get; set; }
         string Vin { get; set; }
         string Make { get; set; }

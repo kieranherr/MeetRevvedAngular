@@ -1,87 +1,60 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using MeetRevvedUp_WebAPI.Interfaces;
 using MeetRevvedUp_WebAPI.Models;
-using System.Net.Http;
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace MeetRevvedUp_WebAPI.Controllers
 {
-    [Route("Clients/api/[controller]")]
+    [Route("api/clients")]
     [ApiController]
     public class ClientsAPIControler : Controller
     {
+        private readonly IClientService _clientService;
 
-
-        private readonly RevvedUpContext _context;
-
-        public ClientsAPIControler(RevvedUpContext context)
+        public ClientsAPIControler(IClientService clientService)
         {
-            _context = context;
+            _clientService = clientService;
         }
-        // GET: api/<ValuesController>
+
+        // GET: Clients/api/ClientsAPI
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            return _clientService.GetDefaultValues();
         }
 
-        // GET api/<ValuesController>/5
+        // GET Clients/api/ClientsAPI/{id}
         [HttpGet("{id}")]
-        public async Task<Client> GetByIdentity(string id)
+        public async Task<Client?> GetByIdentity(string id)
         {
-            var test = await _context.Clients.Where(x => x.IdentityUserId == id).FirstOrDefaultAsync();
-            return test;
+            return await _clientService.GetByIdentityAsync(id);
         }
+
+        // GET Clients/api/ClientsAPI/getcarmeets
         [HttpGet("getcarmeets")]
         public async Task<IEnumerable<CarMeetListRecord>> GetCarMeets()
         {
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-
-            var address = client.City.ToString() + "%20" + client.State.ToString();
-            var httpClient = new HttpClient();
-
-            using HttpResponseMessage response = await httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + $"&key={ApiKeys.GoogleApiKey}");
-            response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
-            var geocode = JsonSerializer.Deserialize<IGeocodeJson>(responseBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })?.Results;
-
-            var carMeets = _context.CarMeets;
-            var applicationDbContext = _context.CarMeets.Where(x => x.State == client.State).Select(x => new CarMeetListRecord
-            {
-                MeetDate = x.MeetDate,
-                MeetId = x.MeetId,
-                MeetName = x.MeetName,
-                MeetTime = x.MeetTime,
-                Lat = x.Lat,
-                Long = x.Long,
-                City = x.City,
-                Zip = x.Zip,
-                State = x.State,
-                Street = x.Street,
-                UserLat = geocode[0].geometry.location.lat,
-                UserLong = geocode[0].geometry.location.lng,
-            });
-            var result = await applicationDbContext.ToListAsync();
-
-            return result;
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            return await _clientService.GetCarMeetsAsync(userId);
         }
 
-        // POST api/<ValuesController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // POST Clients/api/ClientsAPI/create
+        [HttpPost("create")]
+        public async Task<IActionResult> Post([FromBody] Client user)
         {
+            await _clientService.CreateClientAsync(user);
+            return Ok();
         }
 
-        // PUT api/<ValuesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // PUT Clients/api/ClientsAPI/{id}
+        [HttpPut("update")]
+        public async Task<IActionResult> Put([FromBody] Client user)
         {
+            await _clientService.UpdateClientAsync(user);
+            return Ok();
         }
 
-        // DELETE api/<ValuesController>/5
+        // DELETE Clients/api/ClientsAPI/{id}
         [HttpDelete("{id}")]
         public void Delete(int id)
         {

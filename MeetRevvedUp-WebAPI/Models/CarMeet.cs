@@ -28,6 +28,6 @@ namespace MeetRevvedUp_WebAPI.Models
 
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
-        public IdentityUser IdentityUser { get; set; }
+        public IdentityUser? IdentityUser { get; set; }
     }
 }

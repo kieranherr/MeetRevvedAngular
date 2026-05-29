@@ -1,0 +1,87 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <h2>🚗 Your Cars</h2>
+    <button class="btn btn-accent" (click)="addCar()">+ Add Car</button>
+  </div>
+
+  <div *ngIf="loading" class="state-message">Loading your cars...</div>
+  <div *ngIf="error" class="state-message error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error">
+    <div *ngIf="cars.length === 0" class="empty-state">
+      <p>You haven't added any cars yet.</p>
+      <button class="btn btn-primary" (click)="addCar()">Add Your First Car</button>
+    </div>
+
+    <div class="car-grid" *ngIf="cars.length > 0">
+      <div class="car-card" *ngFor="let car of cars">
+        <div class="car-card-header">
+          <span class="car-year">{{ car.year }}</span>
+          <span class="car-rating">⭐ {{ car.avgRating | number:'1.1-1' }}</span>
+        </div>
+        <h3 class="car-name">{{ car.make }} {{ car.model }}</h3>
+        <div class="car-actions">
+          <button class="btn btn-primary" (click)="viewCar(car.carId)">View</button>
+          <button class="btn btn-danger" (click)="deleteCar(car.carId)">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <button class="btn btn-secondary" (click)="goToProfile()">← Back to Profile</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: #1a1a2e;
+    color: #eee;
+  }
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto 2rem;
+  }
+  .page-header h2 { font-size: 1.75rem; margin: 0; }
+  .car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .car-card {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .car-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .car-year { color: #aaa; font-size: 0.9rem; }
+  .car-rating { color: #f0c040; font-size: 0.9rem; }
+  .car-name { font-size: 1.2rem; margin: 0; color: #fff; }
+  .car-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .page-footer { max-width: 900px; margin: 2rem auto 0; }
+  .empty-state { text-align: center; padding: 3rem; color: #aaa; }
+  .empty-state p { margin-bottom: 1rem; font-size: 1.1rem; }
+  .state-message { text-align: center; padding: 3rem; color: #aaa; }
+  .state-message.error { color: #e94560; }
+  .btn { padding: 0.5rem 1.25rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-danger { background: #555; color: #fff; }
+  .btn-secondary { background: #0f3460; color: #fff; }
+  .btn-accent { background: #e94560; color: #fff; }
+  .btn:hover { opacity: 0.85; }
+</style>

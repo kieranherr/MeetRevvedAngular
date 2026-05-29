@@ -14,11 +14,11 @@ namespace MeetRevvedUp_WebAPI.Models
         public int ClientId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public long PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
         public int Age { get; set; }
         public string City { get; set; }
         public string State {  get; set; }
         public string IdentityUserId { get; set; }
-        public IdentityUser IdentityUser { get; set; }
+
     }
 }
